@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Backend environment file
+backend/.env
+
+# Logs
+*.log
+
+# Build folders
+build/
+dist/
+
+# VS Code
+.vscode/
