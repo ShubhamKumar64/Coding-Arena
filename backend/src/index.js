@@ -16,8 +16,9 @@ const cors = require('cors')
 app.use(cors({
     // origin: 'http://localhost:5173',
     origin:[
+         'http://localhost:5173',
             'https://coding-arena-frontend.onrender.com',
-              'http://localhost:5173',
+             
     ] ,
     credentials: true 
 }))
