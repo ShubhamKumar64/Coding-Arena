@@ -1,0 +1,23 @@
+services:
+  backend:
+    type: "web"
+    build:
+      dockerfile: Dockerfile
+    env:
+      # Set these in Koyeb dashboard (use values from your .env)
+      DB_CONNECT_STRING: "${DB_CONNECT_STRING}"
+      JWT_KEY: "${JWT_KEY}"
+      REDIS_PASS: "${REDIS_PASS}"
+      CLOUDINARY_CLOUD_NAME: "${CLOUDINARY_CLOUD_NAME}"
+      CLOUDINARY_API_KEY: "${CLOUDINARY_API_KEY}"
+      CLOUDINARY_API_SECRET: "${CLOUDINARY_API_SECRET}"
+      JUDGE0_KEY: "${JUDGE0_KEY}"
+      GEMINI_KEY: "${GEMINI_KEY}"
+    ports:
+      - 3000
+    health_check:
+      path: "/"
+      interval: 10
+      timeout: 5
+      healthy_threshold: 2
+      unhealthy_threshold: 3
