@@ -23,7 +23,8 @@ app.use(cors({
         
         const isAllowed = allowedOrigins.includes(origin) || 
                           origin.endsWith('.pages.dev') || 
-                          origin.endsWith('.workers.dev');
+                          origin.endsWith('.workers.dev') ||
+                          origin.endsWith('.vercel.app');
                           
         if (isAllowed) {
             callback(null, true);

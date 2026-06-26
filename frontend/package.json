@@ -9,7 +9,8 @@
     "postbuild": "node ./scripts/copy404.cjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy:cloudflare": "echo \"Set CF_PAGES_API_TOKEN, CF_ACCOUNT_ID and CF_PAGES_PROJECT_NAME secrets in GitHub, then push to main to deploy via Cloudflare Pages workflow.\""
+    "deploy:cloudflare": "echo \"Set CF_PAGES_API_TOKEN, CF_ACCOUNT_ID and CF_PAGES_PROJECT_NAME secrets in GitHub, then push to main to deploy via Cloudflare Pages workflow.\"",
+    "deploy:pages": "npx wrangler pages deploy dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

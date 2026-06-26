@@ -1,7 +1,7 @@
 const redisClient = require("../config/redis");
 const User =  require("../models/user")
 const validate = require('../utils/validator');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
 const Submission = require("../models/submission")
 
@@ -34,11 +34,16 @@ const register = async (req,res)=>{
     // })
 
     res.cookie('token', token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    maxAge: 60 * 60 * 1000
-});
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 60 * 60 * 1000
+    });
+    res.status(201).json({
+        user: reply,
+        token,
+        message: "Logged In Successfully"
+    });
     }
     catch(err){
         res.status(400).send("Error: "+err);
@@ -73,15 +78,16 @@ const login = async (req,res)=>{
         const token =  jwt.sign({_id:user._id , emailId:emailId, role:user.role},process.env.JWT_KEY,{expiresIn: 60*60});
         // res.cookie('token',token,{maxAge: 60*60*1000});
         res.cookie('token', token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    maxAge: 60 * 60 * 1000
-});
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 60 * 60 * 1000
+        });
         res.status(201).json({
-            user:reply,
-            message:"Loggin Successfully"
-        })
+            user: reply,
+            token,
+            message: "Login Successful"
+        });
     }
     catch(err){
         res.status(401).send("Error: "+err);
