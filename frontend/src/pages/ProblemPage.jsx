@@ -6,6 +6,7 @@ import axiosClient from "../utils/axiosClient"
 import SubmissionHistory from "../components/SubmissionHistory"
 import ChatAi from '../components/ChatAi';
 import Editorial from '../components/Editorial';
+import confetti from 'canvas-confetti';
 
 const langMap = {
         cpp: 'C++',
@@ -23,10 +24,10 @@ const ProblemPage = () => {
   const [submitResult, setSubmitResult] = useState(null);
   const [activeLeftTab, setActiveLeftTab] = useState('description');
   const [activeRightTab, setActiveRightTab] = useState('code');
+  const [editorTheme, setEditorTheme] = useState('vs-dark');
+  const [fontSize, setFontSize] = useState(14);
   const editorRef = useRef(null);
   let {problemId}  = useParams();
-
-  
 
   const { handleSubmit } = useForm();
 
@@ -57,13 +58,21 @@ const ProblemPage = () => {
   // Update code when language changes
   useEffect(() => {
     if (problem) {
-      const initialCode = problem.startCode.find(sc => sc.language === langMap[selectedLanguage]).initialCode;
-      setCode(initialCode);
+      const savedCode = localStorage.getItem(`code_${problemId}_${selectedLanguage}`);
+      if (savedCode) {
+        setCode(savedCode);
+      } else {
+        const initialCode = problem.startCode.find(sc => sc.language === langMap[selectedLanguage]).initialCode;
+        setCode(initialCode);
+      }
     }
-  }, [selectedLanguage, problem]);
+  }, [selectedLanguage, problem, problemId]);
 
   const handleEditorChange = (value) => {
     setCode(value || '');
+    if (problem) {
+      localStorage.setItem(`code_${problemId}_${selectedLanguage}`, value || '');
+    }
   };
 
   const handleEditorDidMount = (editor) => {
@@ -112,6 +121,14 @@ const ProblemPage = () => {
        setSubmitResult(response.data);
        setLoading(false);
        setActiveRightTab('result');
+       
+       if (response.data.accepted) {
+         confetti({
+           particleCount: 150,
+           spread: 80,
+           origin: { y: 0.6 }
+         });
+       }
       
     } catch (error) {
       console.error('Error submitting code:', error);
@@ -306,7 +323,7 @@ const ProblemPage = () => {
           {activeRightTab === 'code' && (
             <div className="flex-1 flex flex-col">
               {/* Language Selector */}
-              <div className="flex justify-between items-center p-4 border-b border-base-300">
+              <div className="flex flex-wrap justify-between items-center p-4 border-b border-base-300 gap-2">
                 <div className="flex gap-2">
                   {['javascript', 'java', 'cpp'].map((lang) => (
                     <button
@@ -318,6 +335,35 @@ const ProblemPage = () => {
                     </button>
                   ))}
                 </div>
+                
+                {/* Editor settings */}
+                <div className="flex items-center gap-3">
+                  <select 
+                    className="select select-bordered select-sm text-xs rounded-xl focus:outline-none"
+                    value={editorTheme}
+                    onChange={(e) => setEditorTheme(e.target.value)}
+                  >
+                    <option value="vs-dark">Dark (vs-dark)</option>
+                    <option value="light">Light</option>
+                    <option value="hc-black">High Contrast</option>
+                  </select>
+
+                  <div className="flex items-center gap-1 border border-base-300 rounded-xl p-0.5">
+                    <button 
+                      className="btn btn-xs btn-ghost" 
+                      onClick={() => setFontSize(Math.max(12, fontSize - 2))}
+                    >
+                      -
+                    </button>
+                    <span className="text-xs font-mono font-semibold px-2">{fontSize}px</span>
+                    <button 
+                      className="btn btn-xs btn-ghost" 
+                      onClick={() => setFontSize(Math.min(24, fontSize + 2))}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Monaco Editor */}
@@ -328,9 +374,9 @@ const ProblemPage = () => {
                   value={code}
                   onChange={handleEditorChange}
                   onMount={handleEditorDidMount}
-                  theme="vs-dark"
+                  theme={editorTheme}
                   options={{
-                    fontSize: 14,
+                    fontSize: fontSize,
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
                     automaticLayout: true,
