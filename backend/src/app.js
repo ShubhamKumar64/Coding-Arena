@@ -7,6 +7,7 @@ const problemRouter = require("./routes/problemCreator");
 const submitRouter = require("./routes/submit");
 const aiRouter = require("./routes/aiChatting");
 const videoRouter = require("./routes/videoCreator");
+const discussionRouter = require("./routes/discussionRoutes");
 const cors = require('cors');
 
 const allowedOrigins = [
@@ -43,6 +44,7 @@ app.use('/problem', problemRouter);
 app.use('/submission', submitRouter);
 app.use('/ai', aiRouter);
 app.use("/video", videoRouter);
+app.use("/discussion", discussionRouter);
 
 app.get('/', (req, res) => res.send('OK'));
 module.exports = app;

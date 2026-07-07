@@ -7,6 +7,7 @@ import SubmissionHistory from "../components/SubmissionHistory"
 import ChatAi from '../components/ChatAi';
 import Editorial from '../components/Editorial';
 import confetti from 'canvas-confetti';
+import DiscussionForum from '../components/DiscussionForum';
 
 const langMap = {
         cpp: 'C++',
@@ -202,6 +203,13 @@ const ProblemPage = () => {
             ChatAI
           </button>
 
+          <button 
+            className={`tab ${activeLeftTab === 'discussion' ? 'tab-active' : ''}`}
+            onClick={() => setActiveLeftTab('discussion')}
+          >
+            Discussion
+          </button>
+
 
         </div>
 
@@ -287,6 +295,12 @@ const ProblemPage = () => {
                   <div className="whitespace-pre-wrap text-sm leading-relaxed">
                     <ChatAi problem={problem}></ChatAi>
                   </div>
+                </div>
+              )}
+
+              {activeLeftTab === 'discussion' && (
+                <div className="w-full">
+                  <DiscussionForum problemId={problemId} />
                 </div>
               )}
             </>
