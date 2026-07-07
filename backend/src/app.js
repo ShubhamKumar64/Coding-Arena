@@ -11,8 +11,7 @@ const discussionRouter = require("./routes/discussionRoutes");
 const cors = require('cors');
 
 const allowedOrigins = [
-    'http://localhost:5173',
-    'https://coding-arena-frontend.onrender.com'
+    'http://localhost:5173'
 ];
 
 app.use(cors({
