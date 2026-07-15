@@ -21,7 +21,8 @@ export const SocketProvider = ({ children }) => {
       
       const newSocket = io(socketUrl, {
         withCredentials: true,
-        transports: ['websocket', 'polling']
+        transports: ['websocket', 'polling'],
+        autoConnect: false
       });
 
       newSocket.on('connect', () => {
@@ -70,6 +71,9 @@ export const SocketProvider = ({ children }) => {
           } 
         });
       });
+
+      // Bind listeners before calling connect to prevent missing connection event due to race condition
+      newSocket.connect();
 
       setSocket(newSocket);
 
