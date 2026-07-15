@@ -443,91 +443,129 @@ const ProblemPage = () => {
           )}
 
           {activeRightTab === 'testcase' && (
-            <div className="flex-1 p-4 overflow-y-auto">
-              <h3 className="font-semibold mb-4">Test Results</h3>
-              {runResult ? (
-                <div className={`alert ${runResult.success ? 'alert-success' : 'alert-error'} mb-4`}>
-                  <div>
-                    {runResult.success ? (
-                      <div>
-                        <h4 className="font-bold">✅ All test cases passed!</h4>
-                        <p className="text-sm mt-2">Runtime: {runResult.runtime+" sec"}</p>
-                        <p className="text-sm">Memory: {runResult.memory+" KB"}</p>
-                        
-                        <div className="mt-4 space-y-2">
-                          {runResult.testCases.map((tc, i) => (
-                            <div key={i} className="bg-base-100 p-3 rounded text-xs">
-                              <div className="font-mono">
-                                <div><strong>Input:</strong> {tc.stdin}</div>
-                                <div><strong>Expected:</strong> {tc.expected_output}</div>
-                                <div><strong>Output:</strong> {tc.stdout}</div>
-                                <div className={'text-green-600'}>
-                                  {'✓ Passed'}
+            <div className="flex-grow flex flex-col h-full overflow-hidden">
+              <div className="flex-1 p-4 overflow-y-auto">
+                <h3 className="font-semibold mb-4">Test Results</h3>
+                {runResult ? (
+                  <div className={`alert ${runResult.success ? 'alert-success' : 'alert-error'} mb-4`}>
+                    <div>
+                      {runResult.success ? (
+                        <div>
+                          <h4 className="font-bold">✅ All test cases passed!</h4>
+                          <p className="text-sm mt-2">Runtime: {runResult.runtime+" sec"}</p>
+                          <p className="text-sm">Memory: {runResult.memory+" KB"}</p>
+                          
+                          <div className="mt-4 space-y-2">
+                            {runResult.testCases.map((tc, i) => (
+                              <div key={i} className="bg-base-100 p-3 rounded text-xs">
+                                <div className="font-mono">
+                                  <div><strong>Input:</strong> {tc.stdin}</div>
+                                  <div><strong>Expected:</strong> {tc.expected_output}</div>
+                                  <div><strong>Output:</strong> {tc.stdout}</div>
+                                  <div className={'text-green-600'}>
+                                    {'✓ Passed'}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <h4 className="font-bold">❌ Error</h4>
-                        <div className="mt-4 space-y-2">
-                          {runResult.testCases.map((tc, i) => (
-                            <div key={i} className="bg-base-100 p-3 rounded text-xs">
-                              <div className="font-mono">
-                                <div><strong>Input:</strong> {tc.stdin}</div>
-                                <div><strong>Expected:</strong> {tc.expected_output}</div>
-                                <div><strong>Output:</strong> {tc.stdout}</div>
-                                <div className={tc.status_id==3 ? 'text-green-600' : 'text-red-600'}>
-                                  {tc.status_id==3 ? '✓ Passed' : '✗ Failed'}
+                      ) : (
+                        <div>
+                          <h4 className="font-bold">❌ Error</h4>
+                          <div className="mt-4 space-y-2">
+                            {runResult.testCases.map((tc, i) => (
+                              <div key={i} className="bg-base-100 p-3 rounded text-xs">
+                                <div className="font-mono">
+                                  <div><strong>Input:</strong> {tc.stdin}</div>
+                                  <div><strong>Expected:</strong> {tc.expected_output}</div>
+                                  <div><strong>Output:</strong> {tc.stdout}</div>
+                                  <div className={tc.status_id==3 ? 'text-green-600' : 'text-red-600'}>
+                                    {tc.status_id==3 ? '✓ Passed' : '✗ Failed'}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
+                ) : (
+                  <div className="text-gray-500">
+                    Click "Run" to test your code with the example test cases.
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 border-t border-base-300 flex justify-between bg-base-100">
+                <button 
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setActiveRightTab('code')}
+                >
+                  Back to Editor
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    className={`btn btn-outline btn-sm ${loading ? 'loading' : ''}`}
+                    onClick={handleRun}
+                    disabled={loading}
+                  >
+                    Run Again
+                  </button>
+                  <button
+                    className={`btn btn-primary btn-sm ${loading ? 'loading' : ''}`}
+                    onClick={handleSubmitCode}
+                    disabled={loading}
+                  >
+                    Submit
+                  </button>
                 </div>
-              ) : (
-                <div className="text-gray-500">
-                  Click "Run" to test your code with the example test cases.
-                </div>
-              )}
+              </div>
             </div>
           )}
 
           {activeRightTab === 'result' && (
-            <div className="flex-1 p-4 overflow-y-auto">
-              <h3 className="font-semibold mb-4">Submission Result</h3>
-              {submitResult ? (
-                <div className={`alert ${submitResult.accepted ? 'alert-success' : 'alert-error'}`}>
-                  <div>
-                    {submitResult.accepted ? (
-                      <div>
-                        <h4 className="font-bold text-lg">🎉 Accepted</h4>
-                        <div className="mt-4 space-y-2">
-                          <p>Test Cases Passed: {submitResult.passedTestCases}/{submitResult.totalTestCases}</p>
-                          <p>Runtime: {submitResult.runtime + " sec"}</p>
-                          <p>Memory: {submitResult.memory + "KB"} </p>
+            <div className="flex-grow flex flex-col h-full overflow-hidden">
+              <div className="flex-1 p-4 overflow-y-auto">
+                <h3 className="font-semibold mb-4">Submission Result</h3>
+                {submitResult ? (
+                  <div className={`alert ${submitResult.accepted ? 'alert-success' : 'alert-error'}`}>
+                    <div>
+                      {submitResult.accepted ? (
+                        <div>
+                          <h4 className="font-bold text-lg">🎉 Accepted</h4>
+                          <div className="mt-4 space-y-2">
+                            <p>Test Cases Passed: {submitResult.passedTestCases}/{submitResult.totalTestCases}</p>
+                            <p>Runtime: {submitResult.runtime + " sec"}</p>
+                            <p>Memory: {submitResult.memory + "KB"} </p>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <h4 className="font-bold text-lg">❌ {submitResult.error}</h4>
-                        <div className="mt-4 space-y-2">
-                          <p>Test Cases Passed: {submitResult.passedTestCases}/{submitResult.totalTestCases}</p>
+                      ) : (
+                        <div>
+                          <h4 className="font-bold text-lg">❌ {submitResult.error}</h4>
+                          <div className="mt-4 space-y-2">
+                            <p>Test Cases Passed: {submitResult.passedTestCases}/{submitResult.totalTestCases}</p>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="text-gray-500">
-                  Click "Submit" to submit your solution for evaluation.
-                </div>
-              )}
+                ) : (
+                  <div className="text-gray-500">
+                    Click "Submit" to submit your solution for evaluation.
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 border-t border-base-300 flex justify-start bg-base-100">
+                <button 
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setActiveRightTab('code')}
+                >
+                  Back to Editor
+                </button>
+              </div>
             </div>
           )}
         </div>
