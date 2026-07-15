@@ -13,6 +13,9 @@ import AdminDelete from "./components/AdminDelete"
 import AdminUpload from "./components/AdminUpload"
 import AdminUpdate from "./components/AdminUpdate";
 import Leaderboard from "./pages/Leaderboard";
+import BattleLobby from "./pages/BattleLobby";
+import BattleArena from "./pages/BattleArena";
+import ChallengeModal from "./components/ChallengeModal";
 
 function App(){
   
@@ -32,6 +35,7 @@ function App(){
 
   return(
   <>
+    <ChallengeModal />
     <Routes>
       <Route path="/" element={isAuthenticated ?<Homepage></Homepage>:<Navigate to="/signup" />}></Route>
       <Route path="/login" element={isAuthenticated?<Navigate to="/" />:<Login></Login>}></Route>
@@ -45,10 +49,12 @@ function App(){
       <Route path="/admin/video" element={isAuthenticated && user?.role === 'admin' ? <AdminVideo /> : <Navigate to="/" />} />
       <Route path="/admin/upload/:problemId" element={isAuthenticated && user?.role === 'admin' ? <AdminUpload /> : <Navigate to="/" />} />
       <Route path="/problem/:problemId" element={<ProblemPage/>}></Route>
-      
+      <Route path="/battle" element={isAuthenticated ? <BattleLobby /> : <Navigate to="/signup" />}></Route>
+      <Route path="/battle/:battleId" element={isAuthenticated ? <BattleArena /> : <Navigate to="/signup" />}></Route>
     </Routes>
   </>
   )
 }
+
 
 export default App;

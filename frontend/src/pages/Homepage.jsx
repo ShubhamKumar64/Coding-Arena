@@ -3,7 +3,7 @@ import { NavLink } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosClient from '../utils/axiosClient';
 import { logoutUser } from '../authSlice';
-import { Search, Trophy, CheckCircle2, LogOut, ShieldAlert, Sparkles, Code2, HelpCircle } from 'lucide-react';
+import { Search, Trophy, CheckCircle2, LogOut, ShieldAlert, Sparkles, Code2, HelpCircle, Swords } from 'lucide-react';
 
 function Homepage() {
   const dispatch = useDispatch();
@@ -90,6 +90,10 @@ function Homepage() {
           <NavLink to="/leaderboard" className="btn btn-ghost btn-sm text-xs gap-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 rounded-lg">
             <Trophy className="h-3.5 w-3.5 text-yellow-500" />
             Leaderboard
+          </NavLink>
+          <NavLink to="/battle" className="btn btn-ghost btn-sm text-xs gap-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 rounded-lg">
+            <Swords className="h-3.5 w-3.5 text-violet-400 animate-pulse" />
+            Coding Battle
           </NavLink>
         </div>
         <div className="flex-none gap-4">
