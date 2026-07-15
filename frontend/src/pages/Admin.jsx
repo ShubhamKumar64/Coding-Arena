@@ -47,6 +47,13 @@ function Admin() {
   return (
     <div className="min-h-screen bg-base-200">
       <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto mb-6 flex justify-start">
+          <NavLink to="/" className="btn btn-ghost btn-sm gap-2 text-base-content/80 hover:text-base-content">
+            <Home size={18} />
+            Back to Home
+          </NavLink>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-base-content mb-4">

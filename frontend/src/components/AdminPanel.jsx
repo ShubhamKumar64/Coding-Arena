@@ -1,8 +1,9 @@
+import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axiosClient from '../utils/axiosClient';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 // Zod schema matching the problem schema
 const problemSchema = z.object({
@@ -39,10 +40,16 @@ const problemSchema = z.object({
 
 function AdminPanel() {
   const navigate = useNavigate();
+  const { problemId } = useParams();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm({
     resolver: zodResolver(problemSchema),
@@ -78,19 +85,103 @@ function AdminPanel() {
     name: 'hiddenTestCases'
   });
 
+  useEffect(() => {
+    if (problemId) {
+      setIsEditMode(true);
+      fetchProblemDetails();
+    }
+  }, [problemId]);
+
+  const fetchProblemDetails = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axiosClient.get(`/problem/admin/problemById/${problemId}`);
+      reset({
+        title: data.title,
+        description: data.description,
+        difficulty: data.difficulty,
+        tags: data.tags,
+        visibleTestCases: data.visibleTestCases.map(tc => ({
+          input: tc.input,
+          output: tc.output,
+          explanation: tc.explanation
+        })),
+        hiddenTestCases: data.hiddenTestCases.map(tc => ({
+          input: tc.input,
+          output: tc.output
+        })),
+        startCode: data.startCode.map(sc => ({
+          language: sc.language,
+          initialCode: sc.initialCode
+        })),
+        referenceSolution: data.referenceSolution.map(rs => ({
+          language: rs.language,
+          completeCode: rs.completeCode
+        }))
+      });
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to fetch problem details');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
-      await axiosClient.post('/problem/create', data);
-      alert('Problem created successfully!');
-      navigate('/');
+      if (isEditMode) {
+        await axiosClient.put(`/problem/update/${problemId}`, data);
+        alert('Problem updated successfully!');
+      } else {
+        await axiosClient.post('/problem/create', data);
+        alert('Problem created successfully!');
+      }
+      navigate('/admin');
     } catch (error) {
       alert(`Error: ${error.response?.data?.message || error.message}`);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64 min-h-screen">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6 max-w-4xl min-h-screen flex flex-col justify-center">
+        <div className="alert alert-error shadow-lg my-4">
+          <div>
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        </div>
+        <button onClick={() => navigate('/admin')} className="btn btn-outline mt-4">
+          Back to Admin
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Create New Problem</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">
+          {isEditMode ? 'Update Problem' : 'Create New Problem'}
+        </h1>
+        <button 
+          type="button" 
+          onClick={() => navigate('/admin')} 
+          className="btn btn-outline btn-sm"
+        >
+          Cancel
+        </button>
+      </div>
       
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Basic Information */}
@@ -289,7 +380,7 @@ function AdminPanel() {
         </div>
 
         <button type="submit" className="btn btn-primary w-full">
-          Create Problem
+          {isEditMode ? 'Update Problem' : 'Create Problem'}
         </button>
       </form>
     </div>
