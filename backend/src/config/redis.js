@@ -29,7 +29,6 @@ const SPECIAL_PROPS = new Set([
 ]);
 
 // Export a proxy so that the client is instantiated lazily upon first property access.
-// This resolves Cloudflare Worker errors due to accessing crypto.randomBytes in the global scope.
 const redisClientProxy = new Proxy({}, {
     get(target, prop) {
         if (typeof prop === 'symbol' || SPECIAL_PROPS.has(prop)) {
