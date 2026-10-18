@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, NavLink } from 'react-router'; 
-import { loginUser } from "../authSlice";
+import { loginUser, clearError } from "../authSlice";
 import { useEffect, useState } from 'react';
 import { Code2, Terminal, Tv, MessageSquare, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
@@ -16,13 +16,17 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
   
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(loginSchema) });
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -180,8 +184,16 @@ function Login() {
                 )}
               </div>
 
+              {/* Backend Error Display */}
+              {error && (
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2 animate-fade-in-up">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0"></span>
+                  <span>{typeof error === 'string' ? error : error?.message || 'Login failed'}</span>
+                </div>
+              )}
+
               {/* Submit Button */}
-              <div className="pt-3"> 
+              <div className="pt-2"> 
                 <button
                   type="submit"
                   className={`w-full py-3.5 px-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_30px_rgba(99,102,241,0.45)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group ${loading ? 'opacity-80 pointer-events-none' : ''}`}

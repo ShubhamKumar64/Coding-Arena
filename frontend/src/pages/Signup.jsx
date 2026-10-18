@@ -4,26 +4,47 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, NavLink } from 'react-router';
-import { registerUser } from '../authSlice';
-import { Code2, Terminal, Tv, MessageSquare, User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { registerUser, clearError } from '../authSlice';
+import { Code2, Terminal, Tv, MessageSquare, User, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 
 const signupSchema = z.object({
   firstName: z.string().min(3, "First name must be at least 3 characters"),
   emailId: z.string().email("Invalid Email Address"),
-  password: z.string().min(8, "Password must be at least 8 characters")
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter (A-Z)")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter (a-z)")
+    .regex(/[0-9]/, "Password must contain at least one number (0-9)")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character (!@#$%^&*)")
 });
 
 function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({ resolver: zodResolver(signupSchema) });
+
+  const passwordValue = watch('password') || '';
+
+  const passwordCriteria = [
+    { label: "At least 8 characters", valid: passwordValue.length >= 8 },
+    { label: "One uppercase (A-Z)", valid: /[A-Z]/.test(passwordValue) },
+    { label: "One lowercase (a-z)", valid: /[a-z]/.test(passwordValue) },
+    { label: "One number (0-9)", valid: /[0-9]/.test(passwordValue) },
+    { label: "One special symbol (!@#$...)", valid: /[^A-Za-z0-9]/.test(passwordValue) },
+  ];
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -203,10 +224,40 @@ function Signup() {
                     {errors.password.message}
                   </span>
                 )}
+
+                {/* Real-time Password Requirements Checklist */}
+                <div className="mt-3 p-3.5 rounded-xl bg-slate-900/60 border border-white/5 space-y-1.5">
+                  <span className="text-slate-400 font-medium text-[11px] block">Password requirements:</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
+                    {passwordCriteria.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-center gap-1.5 transition-colors text-[11px] ${
+                          item.valid ? 'text-emerald-400 font-medium' : 'text-slate-500'
+                        }`}
+                      >
+                        {item.valid ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                        ) : (
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-600 shrink-0 ml-1 mr-1"></span>
+                        )}
+                        <span>{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
+              {/* Backend Error Display */}
+              {error && (
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2 animate-fade-in-up">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0"></span>
+                  <span>{typeof error === 'string' ? error : error?.message || 'Registration failed'}</span>
+                </div>
+              )}
+
               {/* Submit Button */}
-              <div className="pt-3"> 
+              <div className="pt-2"> 
                 <button
                   type="submit"
                   className={`w-full py-3.5 px-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_30px_rgba(99,102,241,0.45)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group ${loading ? 'opacity-85 pointer-events-none' : ''}`}
