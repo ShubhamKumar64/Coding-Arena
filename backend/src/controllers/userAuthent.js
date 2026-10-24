@@ -15,17 +15,19 @@ const register = async (req,res)=>{
       const {firstName, emailId, password}  = req.body;
 
       req.body.password = await bcrypt.hash(password, 10);
-      req.body.role = 'user'
-    //
+      req.body.role = 'user';
+      req.body.loginCount = 1;
     
-     const user =  await User.create(req.body);
-     const token =  jwt.sign({_id:user._id , emailId:emailId, role:'user'},process.env.JWT_KEY,{expiresIn: 60*60});
-     const reply = {
-        firstName: user.firstName,
-        emailId: user.emailId,
-        _id: user._id,
-        role:user.role,
-    }
+      const user =  await User.create(req.body);
+      const token =  jwt.sign({_id:user._id , emailId:emailId, role:'user'},process.env.JWT_KEY,{expiresIn: 60*60});
+      const reply = {
+         firstName: user.firstName,
+         emailId: user.emailId,
+         _id: user._id,
+         role: user.role,
+         createdAt: user.createdAt,
+         isNewUser: true
+     }
     
     //  res.cookie('token',token,{maxAge: 60*60*1000});
     //  res.status(201).json({
@@ -78,11 +80,21 @@ const login = async (req,res)=>{
             return res.status(401).json({ message: "Wrong username or password" });
         }
 
+        const isFirstLogin = !user.loginCount || user.loginCount === 0;
+        user.loginCount = (user.loginCount || 0) + 1;
+        await user.save();
+
+        const isRecentAccount = user.createdAt && (Date.now() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000);
+        const hasNoSolvedProblems = !user.problemSolved || user.problemSolved.length === 0;
+        const isNewUser = isFirstLogin && isRecentAccount && hasNoSolvedProblems;
+
         const reply = {
             firstName: user.firstName,
             emailId: user.emailId,
             _id: user._id,
             role: user.role,
+            createdAt: user.createdAt,
+            isNewUser: Boolean(isNewUser)
         }
 
         const token = jwt.sign({_id:user._id, emailId:user.emailId, role:user.role}, process.env.JWT_KEY, {expiresIn: 60*60});

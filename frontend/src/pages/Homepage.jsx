@@ -133,12 +133,15 @@ function Homepage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-extrabold tracking-tight">
-                  Welcome back, <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">{user?.firstName}</span>!
+                  {user?.isNewUser ? 'Welcome' : 'Welcome back'}, <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">{user?.firstName}</span>!
                 </h1>
                 <Sparkles className="h-6 w-6 text-yellow-400 animate-bounce" />
               </div>
               <p className="text-slate-400 mt-2 max-w-md">
-                Fuel your passion, master algorithms, and conquer the leaderboard in the ultimate coding arena.
+                {user?.isNewUser 
+                  ? "Welcome to Coding Arena! Start your journey, master algorithms, and conquer the leaderboard."
+                  : "Fuel your passion, master algorithms, and conquer the leaderboard in the ultimate coding arena."
+                }
               </p>
               
               {/* Stats Breakdown */}

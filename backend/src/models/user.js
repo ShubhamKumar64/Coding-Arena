@@ -38,6 +38,10 @@ const userSchema = new Schema({
             unique:true
         }],
     },
+    loginCount:{
+        type: Number,
+        default: 0
+    },
     password:{
         type:String,
         required: true
