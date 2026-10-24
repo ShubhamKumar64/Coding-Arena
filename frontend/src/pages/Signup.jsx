@@ -43,7 +43,9 @@ function Signup() {
   ];
 
   useEffect(() => {
-    dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
   }, [dispatch]);
 
   useEffect(() => {

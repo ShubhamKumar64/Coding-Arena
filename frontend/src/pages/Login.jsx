@@ -25,7 +25,9 @@ function Login() {
   } = useForm({ resolver: zodResolver(loginSchema) });
 
   useEffect(() => {
-    dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
   }, [dispatch]);
 
   useEffect(() => {
@@ -40,6 +42,28 @@ function Login() {
 
   return (
     <div className="min-h-screen flex bg-[#07090e] text-slate-200 font-sans relative overflow-hidden">
+      {/* Floating Popup / Warning Notification */}
+      {error && (
+        <div className="fixed top-6 right-6 z-50 max-w-sm w-[90%] sm:w-auto animate-fade-in-up">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-red-950/95 border border-red-500/50 text-red-200 shadow-2xl backdrop-blur-md">
+            <div className="p-2 bg-red-500/20 rounded-xl">
+              <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+            </div>
+            <div className="flex-1 pr-2">
+              <p className="text-xs font-bold text-red-400 uppercase tracking-wider">Authentication Alert</p>
+              <p className="text-sm font-semibold text-white mt-0.5">{typeof error === 'string' ? error : error?.message || 'Wrong username or password'}</p>
+            </div>
+            <button 
+              type="button"
+              onClick={() => dispatch(clearError())} 
+              className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors text-sm font-bold"
+              aria-label="Dismiss warning"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
       {/* Dynamic Background Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none animate-blob-slow"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none animate-blob-medium"></div>

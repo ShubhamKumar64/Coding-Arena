@@ -52,6 +52,7 @@ const authSlice = createSlice({
     user: null,
     isAuthenticated: false,
     loading: false,
+    authChecking: true,
     error: null
   },
   reducers: {
@@ -116,17 +117,16 @@ const authSlice = createSlice({
 
       // Check Auth Cases
       .addCase(checkAuth.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.authChecking = true;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
-        state.loading = false;
+        state.authChecking = false;
         state.isAuthenticated = !!action.payload;
         state.user = action.payload;
         state.error = null;
       })
       .addCase(checkAuth.rejected, (state) => {
-        state.loading = false;
+        state.authChecking = false;
         state.error = null; // No active session on start is normal, not an error
         state.isAuthenticated = false;
         state.user = null;

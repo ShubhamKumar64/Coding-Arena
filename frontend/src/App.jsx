@@ -20,14 +20,14 @@ import ChallengeModal from "./components/ChallengeModal";
 function App(){
   
   const dispatch = useDispatch();
-  const {isAuthenticated,user,loading} = useSelector((state)=>state.auth);
+  const {isAuthenticated, user, authChecking} = useSelector((state)=>state.auth);
 
   // check initial authentication
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
   
-  if (loading) {
+  if (authChecking) {
     return <div className="min-h-screen flex items-center justify-center">
       <span className="loading loading-spinner loading-lg"></span>
     </div>;
