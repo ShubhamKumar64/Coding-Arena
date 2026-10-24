@@ -17,7 +17,8 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
     const response = await axiosClient.post('/user/login', credentials);
     return response.data.user;
   } catch (error) {
-    return rejectWithValue(error);
+    const errorMsg = error.response?.data?.message || (typeof error.response?.data === 'string' ? error.response.data : null) || error.message;
+    return rejectWithValue(errorMsg);
   }
 }
 );
@@ -91,7 +92,24 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : action.payload?.message || 'Something went wrong';
+        let msg = action.payload;
+        if (typeof msg === 'string') {
+          msg = msg.replace(/^Error:\s*/i, '');
+          if (
+            msg.toLowerCase().includes('credential') || 
+            msg.toLowerCase().includes('401') || 
+            msg.toLowerCase().includes('failed with status') ||
+            msg.toLowerCase().includes('null') ||
+            msg.toLowerCase().includes('something went wrong')
+          ) {
+            msg = 'Wrong username or password';
+          }
+        } else if (msg?.message) {
+          msg = msg.message;
+        } else {
+          msg = 'Wrong username or password';
+        }
+        state.error = msg || 'Wrong username or password';
         state.isAuthenticated = false;
         state.user = null;
       })

@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, NavLink } from 'react-router'; 
 import { loginUser, clearError } from "../authSlice";
 import { useEffect, useState } from 'react';
-import { Code2, Terminal, Tv, MessageSquare, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Code2, Terminal, Tv, MessageSquare, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 const loginSchema = z.object({
-  emailId: z.string().email("Invalid Email Address"),
-  password: z.string().min(8, "Password must be at least 8 characters") 
+  emailId: z.string().min(1, "Email or Username is required"),
+  password: z.string().min(1, "Password is required") 
 });
 
 function Login() {
@@ -127,15 +127,15 @@ function Login() {
               {/* Email Field */}
               <div className="form-control">
                 <label className="label py-1">
-                  <span className="label-text font-medium text-slate-300 text-sm">Email Address</span>
+                  <span className="label-text font-medium text-slate-300 text-sm">Email Address or Username</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                     <Mail className="h-5 w-5" />
                   </div>
                   <input
-                    type="email"
-                    placeholder="john@example.com"
+                    type="text"
+                    placeholder="john@example.com or username"
                     className={`glass-input w-full pl-11 pr-4 py-3 rounded-xl text-sm ${errors.emailId ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/20' : ''}`}
                     {...register('emailId')}
                   />
@@ -184,11 +184,14 @@ function Login() {
                 )}
               </div>
 
-              {/* Backend Error Display */}
+              {/* Backend Error / Warning Display */}
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2 animate-fade-in-up">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0"></span>
-                  <span>{typeof error === 'string' ? error : error?.message || 'Login failed'}</span>
+                <div 
+                  role="alert"
+                  className="p-3.5 bg-red-500/15 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-center gap-2.5 animate-fade-in-up shadow-sm"
+                >
+                  <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+                  <span className="font-medium">{typeof error === 'string' ? error : error?.message || 'Wrong username or password'}</span>
                 </div>
               )}
 

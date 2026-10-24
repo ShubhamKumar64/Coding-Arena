@@ -56,41 +56,50 @@ const login = async (req,res)=>{
     try{
         const {emailId, password} = req.body;
 
-        if(!emailId)
-            throw new Error("Invalid Credentials");
-        if(!password)
-            throw new Error("Invalid Credentials");
+        if(!emailId || !password){
+            return res.status(401).json({ message: "Wrong username or password" });
+        }
 
-        const user = await User.findOne({emailId});
+        const identifier = (emailId || '').trim();
+        const user = await User.findOne({
+            $or: [
+                { emailId: identifier.toLowerCase() },
+                { firstName: identifier }
+            ]
+        });
 
-        const match = await bcrypt.compare(password,user.password);
+        if(!user){
+            return res.status(401).json({ message: "Wrong username or password" });
+        }
 
-        if(!match)
-            throw new Error("Invalid Credentials");
+        const match = await bcrypt.compare(password, user.password);
+
+        if(!match){
+            return res.status(401).json({ message: "Wrong username or password" });
+        }
 
         const reply = {
             firstName: user.firstName,
             emailId: user.emailId,
             _id: user._id,
-            role:user.role,
+            role: user.role,
         }
 
-        const token =  jwt.sign({_id:user._id , emailId:emailId, role:user.role},process.env.JWT_KEY,{expiresIn: 60*60});
-        // res.cookie('token',token,{maxAge: 60*60*1000});
+        const token = jwt.sign({_id:user._id, emailId:user.emailId, role:user.role}, process.env.JWT_KEY, {expiresIn: 60*60});
         res.cookie('token', token, {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
             maxAge: 60 * 60 * 1000
         });
-        res.status(201).json({
+        res.status(200).json({
             user: reply,
             token,
             message: "Login Successful"
         });
     }
     catch(err){
-        res.status(401).send("Error: "+err);
+        res.status(401).json({ message: "Wrong username or password" });
     }
 }
 
